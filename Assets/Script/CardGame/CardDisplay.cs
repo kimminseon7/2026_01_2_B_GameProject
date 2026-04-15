@@ -12,11 +12,13 @@ public class CardDisplay : MonoBehaviour
     public TextMeshPro attackText;
     public TextMeshPro descriptionText;
 
-    private bool isDragging = false;
+    public bool isDragging = false;
     private Vector3 originalPosition;
 
     public LayerMask enemyLayer;
     public LayerMask playerLayer;
+
+    private CardManager cardManager;
 
     public void Start()
     {
@@ -61,6 +63,14 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseUp()
     {
+
+        if(CardManager.Instance.playerStats == null || CardManager.Instance.playerStats.currentMana < cardData.manaCost)
+        {
+            Debug.Log($"마나가 부족합니다.! (필요 : {cardData.manaCost} , guswo : {CardManager.Instance.playerStats.currentMana}");
+            transform.position = originalPosition;
+            return;
+        }
+
         isDragging = false;
 
         RaycastHit hit;
@@ -101,17 +111,29 @@ public class CardDisplay : MonoBehaviour
                 }
             }
         }
+        else if(CardManager.Instance != null)
+        {
+            float distToDiscard = Vector3.Distance(transform.position, CardManager.Instance.discardPosition.position);
+            if (distToDiscard < 2.0f)
+            {
+                CardManager.Instance.DiscardCard(cardIndex);
+                return;
+            }
+        }
 
         if(!cardUsed)
         {
             transform.position = originalPosition;
+            CardManager.Instance.ArrengeHand();
         }
         else
         {
-            Destroy(gameObject);
+            if (CardManager.Instance != null)
+                CardManager.Instance.DiscardCard(cardIndex);
+
+            CardManager.Instance.playerStats.UseMana(cardData.manaCost);
+            Debug.Log($"마나를 {cardData.manaCost} 사용 했습니다.");
         }
     }
-    
-
 }
 
