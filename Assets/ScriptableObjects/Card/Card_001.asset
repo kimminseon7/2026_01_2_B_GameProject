@@ -18,3 +18,8 @@ MonoBehaviour:
   manaCost: 1
   effectAmount: 1
   cardType: 0
+  additionalEffects:
+  - effectType: 1
+    effectAmount: 0
+  - effectType: 2
+    effectAmount: 0
